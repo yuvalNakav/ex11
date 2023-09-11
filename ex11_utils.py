@@ -121,7 +121,8 @@ def find_length_n_words(n: int, board: Board, words: Iterable[str]) -> List[Path
             _find_length_helper(i, j, [])
 
     return valid_paths
+print("hey")
 
 def max_score_paths(board: Board, words: Iterable[str]) -> List[Path]:
     pass
-print("hey")
+
