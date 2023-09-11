@@ -98,3 +98,4 @@ def find_length_n_words(n: int, board: Board, words: Iterable[str]) -> List[Path
 
 def max_score_paths(board: Board, words: Iterable[str]) -> List[Path]:
     pass
+print("hey")
