@@ -61,23 +61,25 @@ def valid_word(board: Board, path: Path):
     return word
 
 
-def find_length_n_paths(n: int, board: Board, words: Iterable[str]) -> List[Path]:
-    def is_valid_move(x: int, y: int) -> bool:
-        return 0 <= x < len(board) and 0 <= y < len(board[0]) and not visited[x][y]
+def is_valid_move(x: int, y: int, board: Board, visited: List[List[bool]]) -> bool:
+    return 0 <= x < len(board) and 0 <= y < len(board[0]) and not visited[x][y]
 
-    def dfs(x: int, y: int, path: Path):
+
+def find_length_n_paths(n: int, board: Board, words: Iterable[str]) -> List[Path]:
+
+    def _find_length_helper(x: int, y: int, path: Path):
         visited[x][y] = True
         path.append((x, y))
         current_word = "".join([board[i][j] for i, j in path])
-        if len(current_word) == n and current_word in words:
+        if len(path) == n and current_word in words:
             valid_paths.append(path[:])
 
-        if len(current_word) < n:
-            for dx in [-1, 0, 1]:
-                for dy in [-1, 0, 1]:
-                    new_x, new_y = x + dx, y + dy
-                    if is_valid_move(new_x, new_y):
-                        dfs(new_x, new_y, path)
+        if len(path) < n:
+            for delta_x in [-1, 0, 1]:
+                for delta_y in [-1, 0, 1]:
+                    new_x, new_y = x + delta_x, y + delta_y
+                    if is_valid_move(new_x, new_y, board, visited):
+                        _find_length_helper(new_x, new_y, path)
 
         path.pop()
         visited[x][y] = False
@@ -87,14 +89,38 @@ def find_length_n_paths(n: int, board: Board, words: Iterable[str]) -> List[Path
 
     for i in range(len(board)):
         for j in range(len(board[0])):
-            dfs(i, j, [])
+            _find_length_helper(i, j, [])
 
     return valid_paths
 
-def find_length_n_words(n: int, board: Board, words: Iterable[str]) -> List[Path]:
-    valid_paths = find_length_n_paths(n, board, words)
-    return ["".join([board[i][j] for i, j in path]) for path in valid_paths]
 
+def find_length_n_words(n: int, board: Board, words: Iterable[str]) -> List[Path]:
+
+    def _find_length_helper(x: int, y: int, path: Path):
+        visited[x][y] = True
+        path.append((x, y))
+        current_word = "".join([board[i][j] for i, j in path])
+        if len(current_word) == n and current_word in words:
+            valid_paths.append(path[:])
+
+        if len(current_word) < n:
+            for delta_x in [-1, 0, 1]:
+                for delta_y in [-1, 0, 1]:
+                    new_x, new_y = x + delta_x, y + delta_y
+                    if is_valid_move(new_x, new_y, board, visited):
+                        _find_length_helper(new_x, new_y, path)
+
+        path.pop()
+        visited[x][y] = False
+
+    valid_paths = []
+    visited = [[False for _ in range(len(board[0]))] for _ in range(len(board))]
+
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            _find_length_helper(i, j, [])
+
+    return valid_paths
 
 def max_score_paths(board: Board, words: Iterable[str]) -> List[Path]:
     pass
