@@ -62,53 +62,38 @@ def valid_word(board: Board, path: Path):
 
 
 def find_length_n_paths(n: int, board: Board, words: Iterable[str]) -> List[Path]:
-    """
-    Run recursively
-    """
-    all_paths = []
+    def is_valid_move(x: int, y: int) -> bool:
+        return 0 <= x < len(board) and 0 <= y < len(board[0]) and not visited[x][y]
+
+    def dfs(x: int, y: int, path: Path):
+        visited[x][y] = True
+        path.append((x, y))
+        current_word = "".join([board[i][j] for i, j in path])
+        if len(current_word) == n and current_word in words:
+            valid_paths.append(path[:])
+
+        if len(current_word) < n:
+            for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    new_x, new_y = x + dx, y + dy
+                    if is_valid_move(new_x, new_y):
+                        dfs(new_x, new_y, path)
+
+        path.pop()
+        visited[x][y] = False
+
+    valid_paths = []
+    visited = [[False for _ in range(len(board[0]))] for _ in range(len(board))]
+
     for i in range(len(board)):
         for j in range(len(board[0])):
-            path = add_cell_to_path(board, n, [], i, j)
-            print(path)
-            word = convert_path_to_word(path, board)
-            print("word", word, "!!!!!")
-            # if word in words and path not in all_paths:
-            #     print("helloooooo")
-            all_paths.append(path)
-    return all_paths
+            dfs(i, j, [])
 
-
-# def generate_paths(board: Board, length: int, path: set[Tuple[int, int]], i:int, j:int):
-# def generate_paths(board: Board, length: int, path: Path, i: int, j: int, words):
-
-def convert_path_to_word(path, board):
-    word = ""
-    for cell in path:
-        print(cell)
-        i,j = cell
-        word += board[i][j]
-    return word
-
-
-def add_cell_to_path(board: Board, length: int, path: Path, i: int, j: int):
-    if len(path) < length:
-        print("hihihi")
-        # if valid_word(board, path):
-        #     print("hihihi2")
-        path.append((i ,j))
-        for move in POSSIBLE_MOVES:
-            print("!!!!!!", move, path)
-            if (0 <= i + move[0] <= len(board) and 0 <= j + move[1] <= len(board)):
-                add_cell_to_path(board, length, path, i + move[0], j + move[1])
-                # path.pop()
-    elif len(path) == length:
-        return path
-    else:
-        return None
-
+    return valid_paths
 
 def find_length_n_words(n: int, board: Board, words: Iterable[str]) -> List[Path]:
-    pass
+    valid_paths = find_length_n_paths(n, board, words)
+    return ["".join([board[i][j] for i, j in path]) for path in valid_paths]
 
 
 def max_score_paths(board: Board, words: Iterable[str]) -> List[Path]:

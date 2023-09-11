@@ -1,33 +1,20 @@
 import ex11_utils as utils
 board = [
-    ["d", "c", "b", "a"],
+    ["D", "C", "B", "A"],
 
-    ["g", "a", "d", "e"],
+    ["G", "A", "D", "E"],
 
-    ["t", "j", "y", "t"],
+    ["T", "J", "Y", "T"],
 
-    ["n", "m", "f", "i"]]
-path = [(3, 2), (3, 3), (2, 3)]
+    ["N", "M", "F", "I"]]
+# path = [(3, 2), (3, 3), (2, 3)]
+words = []
+with open("boggle_dict.txt", "r") as txt_file:
+    words = [word.split("\n")[0] for word in txt_file.readlines()]
 
+# print(len(words), words)
 # print("final",utils.is_valid_path(board, path, ["bed", "fit", "day", "did", "dad", "bad", "dcd"]))
-print("final", utils.find_length_n_paths(3, board, ["bed", "fit", "day", "did", "dad", "bad"]))
-
-gogo = [
-    [(0, 0), (0, 1), (0, 0)],
-    [(0, 1), (0, 0), (0, 1)],
-    [(0, 2), (0, 1), (0, 0)],
-    [(0, 3), (0, 2), (0, 1)],
-    [(1, 0), (0, 0), (0, 1)],
-    [(1, 1), (0, 0), (0, 1)],
-    [(1, 2), (0, 1), (0, 0)],
-    [(1, 3), (0, 2), (0, 1)],
-    [(2, 0), (1, 0), (0, 0)],
-    [(2, 1), (1, 0), (0, 0)],
-    [(2, 2), (1, 1), (0, 0)],
-    [(2, 3), (1, 2), (0, 1)],
-    [(3, 0), (2, 0), (1, 0)],
-    [(3, 1), (2, 0), (1, 0)],
-    [(3, 2), (2, 1), (1, 0)],
-    [(3, 3), (2, 2), (1, 1)]
-]
-print(len(gogo))
+# paths = utils.find_length_n_paths(3, board, words)
+paths = utils.find_length_n_words(3, board, words)
+# paths = utils.find_length_n_paths(5, board, [word.upper() for word in ["bed", "fit", "day"]])
+print("final", len(paths), paths)
