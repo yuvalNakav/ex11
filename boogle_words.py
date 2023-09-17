@@ -1,6 +1,7 @@
 import tkinter as tki
 import tkinter.ttk as ttk
 
+
 class Words:
     def __init__(self, root):
         self._root = root

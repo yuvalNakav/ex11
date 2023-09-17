@@ -4,13 +4,15 @@ import ex11_utils
 
 Board = List[List[str]]
 Path = List[Tuple[int, int]]
-POSSIBLE_MOVES = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1,1)]
+POSSIBLE_MOVES = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
 
-_board = [['L', 'L', 'E', 'N'],
-          ['O', 'F', 'E', 'T'],
-          ['N', 'E', 'T', 'H'],
-          ['N', 'E', 'E', 'QU']]
+_board = [
+    ["L", "L", "E", "N"],
+    ["O", "F", "E", "T"],
+    ["N", "E", "T", "H"],
+    ["N", "E", "E", "QU"],
+]
 # path = [(3, 2), (3, 3), (2, 3)]
 # _words = []
 with open("boggle_dict.txt", "r") as txt_file:
@@ -33,6 +35,7 @@ def max_score_paths(board: Board, words: Iterable[str]) -> List[Path]:
 
 letters_3 = [word for word in _words if len(word) == 3]
 
+
 def _valid_side(start: tuple, end: tuple) -> bool:
     """
     " checking for valid side. start and end Coordinates given,
@@ -47,6 +50,8 @@ def _valid_side(start: tuple, end: tuple) -> bool:
             return True
     else:
         return False
+
+
 def _valid_diagonal(start: tuple, end: tuple) -> bool:
     """
     Coordinates are given, start and end.
@@ -80,6 +85,8 @@ def _valid_cord(path: Path, board: Board) -> bool:
         if cords[1] < 0 or cords[1] >= len(board[0]):
             return False
     return True
+
+
 def is_valid_path(board: Board, path: Path, words: Iterable[str]) -> Optional[str]:
     """
     Validity, we are checking . A path and words, given.
@@ -92,11 +99,13 @@ def is_valid_path(board: Board, path: Path, words: Iterable[str]) -> Optional[st
     word_of_path = ""
     # this part checks if there are no repetition for cords in path
     for ind in range(len(path) - 1):
-        if path[ind] in path[ind + 1:] or path[ind] in path[:ind]:
+        if path[ind] in path[ind + 1 :] or path[ind] in path[:ind]:
             return
     # this part checks if cords in path has valid location compare to next cord
     for cord_index in range(len(path) - 1):
-        if not _valid_side(path[cord_index], path[cord_index + 1]) and not _valid_diagonal(path[cord_index], path[cord_index + 1]):
+        if not _valid_side(
+            path[cord_index], path[cord_index + 1]
+        ) and not _valid_diagonal(path[cord_index], path[cord_index + 1]):
             return
         word_of_path += board[path[cord_index][0]][path[cord_index][1]]
     word_of_path += board[path[-1][0]][path[-1][1]]
@@ -116,11 +125,11 @@ def _next_place(board: Board, place: Tuple[int, int]) -> List[Tuple[int, int]]:
     """
     final_lst = []
     for cord in POSSIBLE_MOVES:
-        if _valid_cord([(place[0]+cord[0], place[1]+cord[1])], board):
-            if _valid_diagonal(place, (place[0] + cord[0],place[1] + cord[1])):
-                    final_lst.append((place[0]+cord[0], place[1]+cord[1]))
-            if _valid_side(place, (place[0]+cord[0], place[1]+cord[1])):
-                    final_lst.append((place[0]+cord[0], place[1]+cord[1]))
+        if _valid_cord([(place[0] + cord[0], place[1] + cord[1])], board):
+            if _valid_diagonal(place, (place[0] + cord[0], place[1] + cord[1])):
+                final_lst.append((place[0] + cord[0], place[1] + cord[1]))
+            if _valid_side(place, (place[0] + cord[0], place[1] + cord[1])):
+                final_lst.append((place[0] + cord[0], place[1] + cord[1]))
     return final_lst
 
 
@@ -155,13 +164,18 @@ def find_length_n_paths(n: int, board: Board, words: Iterable[str]) -> List[Path
     for row in range(len(board)):
         for col in range(len(board[row])):
             cord = (row, col)
-            _find_n_length_helper(n, board, words, lst_final, [cord],set_partial)
+            _find_n_length_helper(n, board, words, lst_final, [cord], set_partial)
     return lst_final
 
 
-
-def _find_n_length_helper(n: int, board: Board, words: Iterable[str],lst_final: List, lst_one_cord: List, set_partial: set) -> None:
-
+def _find_n_length_helper(
+    n: int,
+    board: Board,
+    words: Iterable[str],
+    lst_final: List,
+    lst_one_cord: List,
+    set_partial: set,
+) -> None:
     """
     helper to backtrack on all the possible n lengths
     :param n: num of wanted cells
@@ -182,7 +196,9 @@ def _find_n_length_helper(n: int, board: Board, words: Iterable[str],lst_final: 
     for move in _next_place(board, now_cord):
         if move in lst_one_cord:
             continue
-        _find_n_length_helper(n, board, words, lst_final,lst_one_cord + [move], set_partial)
+        _find_n_length_helper(
+            n, board, words, lst_final, lst_one_cord + [move], set_partial
+        )
     return
 
 
@@ -220,7 +236,14 @@ def _cord_to_letter(path, board):
     return final_word
 
 
-def _find_n_word_length_helper(n: int, board: Board, words: Iterable[str], lst_final: List[Tuple[int, int]],lst_one_cord,set_partial_words: set) -> None:
+def _find_n_word_length_helper(
+    n: int,
+    board: Board,
+    words: Iterable[str],
+    lst_final: List[Tuple[int, int]],
+    lst_one_cord,
+    set_partial_words: set,
+) -> None:
     """
     A helper function for finding words of a specific length (n) on a given Boggle board.
     :param n: the length of the words being searched for
@@ -241,7 +264,9 @@ def _find_n_word_length_helper(n: int, board: Board, words: Iterable[str], lst_f
     for move in _next_place(board, now_cord):
         if move in lst_one_cord:
             continue
-        _find_n_word_length_helper(n, board, words, lst_final, lst_one_cord + [move], set_partial_words)
+        _find_n_word_length_helper(
+            n, board, words, lst_final, lst_one_cord + [move], set_partial_words
+        )
     return
 
 
@@ -258,7 +283,7 @@ def _char_in_lst(lst, board):
     return counter
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # us = ex11_utils.find_length_n_paths(3, board, _words)
     # us2 = ex11_utils.find_length_n_words(3, board, _words)
     # his = find_length_n_paths(3, board, _words)

@@ -14,11 +14,9 @@ button_styles = {
     # "bg": "red",
     # "fg": "red"
     # "cursor": "man"
-    }
-
-selected_button_Styles = {
-    "curser": "X_cursor"
 }
+
+selected_button_Styles = {"curser": "X_cursor"}
 
 input_styles = {
     # "fg": "black",
@@ -26,7 +24,6 @@ input_styles = {
     # "pady": 10,
     # "bg": "black",
     # "underline": 0
-
 }
 
 # def on_click(event):
@@ -43,4 +40,3 @@ def set_is_pressed(self):
         return tki.DISABLED
     else:
         return tki.NORMAL
-

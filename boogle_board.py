@@ -1,7 +1,7 @@
 import tkinter as tki
 import tkinter.ttk as ttk
 import boggle_board_randomizer
-import boogle as controller
+import boggle as controller
 import boogle_cell
 import boggle_input
 import boogle_words
@@ -11,10 +11,6 @@ import gui_helpers as helper
 import boggle_logics as logics
 import timer
 import tkinter.messagebox as messagebox
-import ttkthemes
-
-
-# TODO: timer, timer logics, delete button(?), scoring system, score comp
 
 
 class BoggleBoard:
@@ -26,20 +22,27 @@ class BoggleBoard:
         self.curr_cell = None
         self.paths = []
         self.style = ttk.Style()
-        self.style.theme_use("aqua")
         self._input = boggle_input.Input()
         self.score = score.Score(self._root)
         self.timer = timer.Timer(self._root, self.on_game_end)
-        self.check_button = boggle_button.BoggleButton(self._root, self.check_word, "Check", 1, 3)
-        self.delete_button = boggle_button.BoggleButton(self._root, self.remove_letter, "Delete", 1, 2)
-        self._cells = [[boogle_cell.Cell(cell, i, j, self._root, self.add_to_curr_word, self.validate_press)
-                        for j, cell in enumerate(row)]
-                       for i, row in enumerate(self.board)]
-
+        self.check_button = boggle_button.BoggleButton(
+            self._root, self.check_word, "Check", 1, 3, "SeaGreen3"
+        )
+        self.delete_button = boggle_button.BoggleButton(
+            self._root, self.remove_letter, "Delete", 1, 2, "tomato3"
+        )
+        self._cells = [
+            [
+                boogle_cell.Cell(
+                    cell, i, j, self._root, self.add_to_curr_word, self.validate_press
+                )
+                for j, cell in enumerate(row)
+            ]
+            for i, row in enumerate(self.board)
+        ]
         self.used_words = boogle_words.Words(self._root)
 
     def check_word(self, event):
-        # todo: logics
         if logics.check_word_validity(self._input.curr_word, self._input.path):
             self.used_words.add_word(self._input.curr_word.get())
             self.paths.append(self._input.path)
@@ -67,19 +70,23 @@ class BoggleBoard:
 
     def remove_letter(self, event):
         if len(self._input.path):
-            self._input.curr_word.set(value=self._input.curr_word.get()[:-1])
+            self._input.curr_word.set(value=self._input.curr_word.get()[:-1]) #todo: check "QU"
             row, col = self._input.path.pop()
             self._cells[row][col].restart()
-            last_row, last_col = self._input.path[-1]
-            self.curr_cell = self._cells[last_row][last_col]
+            if len(self._input.path):
+                last_row, last_col = self._input.path[-1]
+                self.curr_cell = self._cells[last_row][last_col]
+            else:
+                self.curr_cell = None
 
     def on_game_end(self):
-        will_continue = messagebox.askyesno(title="Game Ended!",
-                                            message=f"Good game! your score was {self.score.score.get()}, would you like to play again?")
+        will_continue = messagebox.askyesno(
+            title="Game Ended!",
+            message=f"Good game! your score was {self.score.score.get()}, would you like to play again?",
+        )
         if will_continue:
-            print("hi")
             self.init_new_game()
-        else:
+        else: # todo: close program
             print("else")
             # self._root.
             # self._root.
@@ -87,9 +94,15 @@ class BoggleBoard:
 
     def init_new_game(self):
         self.board = boggle_board_randomizer.randomize_board()
-        self._cells = [[boogle_cell.Cell(cell, i, j, self._root, self.add_to_curr_word, self.validate_press)
-                        for j, cell in enumerate(row)]
-                       for i, row in enumerate(self.board)]
+        self._cells = [
+            [
+                boogle_cell.Cell(
+                    cell, i, j, self._root, self.add_to_curr_word, self.validate_press
+                )
+                for j, cell in enumerate(row)
+            ]
+            for i, row in enumerate(self.board)
+        ]
         self.restart_buttons()
         self.timer.restart_timer()
 
@@ -102,4 +115,3 @@ class BoggleBoard:
 #     print(self.style.theme_names())
 #     _board = BoggleBoard(boggle_board_randomizer.randomize_board())
 #     _board.run()
-
