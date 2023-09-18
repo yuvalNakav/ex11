@@ -17,7 +17,7 @@ def check_valid_next_press(curr_cell: cell.Cell, next_cell: cell.Cell) -> bool:
 
 
 def check_word_validity(word: tki.StringVar, path: List[Tuple[int, int]]):
-    if len(path) >= 3:
+    if len(path) >= 1:  # there is a word
         return word.get() in words
     else:
         return False
