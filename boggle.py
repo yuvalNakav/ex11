@@ -1,9 +1,9 @@
-import tkinter as tki
-import boogle_board
+import board
 
 
-def handle_game():
-    _board = boogle_board.BoggleBoard()
+def handle_game() -> None:
+    """Handles actual gameplay"""
+    _board = board.Board()
     _board.run()
 
 

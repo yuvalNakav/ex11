@@ -1,10 +1,13 @@
+from typing import *
+import tkinter as tki
+import cell
+
 with open("boggle_dict.txt", "r") as txt_file:
     words = [word.split("\n")[0] for word in txt_file.readlines()]
 
-# print(len(words))
 
-
-def check_valid_next_press(curr_cell, next_cell):
+def check_valid_next_press(curr_cell: cell.Cell, next_cell: cell.Cell) -> bool:
+    """Validates press by current cell and next cell's locations"""
     if curr_cell:
         return (
             -1 <= curr_cell.row - next_cell.row <= 1
@@ -13,7 +16,7 @@ def check_valid_next_press(curr_cell, next_cell):
     return True
 
 
-def check_word_validity(word, path):
+def check_word_validity(word: tki.StringVar, path: List[Tuple[int, int]]):
     if len(path) >= 3:
         return word.get() in words
     else:

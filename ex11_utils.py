@@ -1,4 +1,4 @@
-from typing import List, Tuple, Iterable, Optional
+from typing import *
 
 Board = List[List[str]]
 Path = List[Tuple[int, int]]
@@ -6,28 +6,31 @@ Path = List[Tuple[int, int]]
 
 def is_valid_path(board: Board, path: Path, words: Iterable[str]) -> Optional[str]:
     """
-
-    Making sure that the word exists in dict.txt
-    :param board:
-    :param path:
-    :param words:
-    :return:
+    Checks if the path is valid, this function checks if the path represent a word in the board and if
+    the word in the words collection
+    :param board: Game board
+    :param path: The current path that given as parameter
+    :param words: Given collection of words
+    :return:  The word represented by the path or None if the word is None or not is the words collection
     """
     word = valid_word(board, path)
-    # print("word in  is valid", word)
-    if word in words:
-        return word
+    if word:
+        if word in words:
+            return word
+        else:
+            return None
     else:
         return None
 
 
 def valid_word(board: Board, path: Path):
     """
-    Making sure that all items in path are legal (x,y < 4)
+    Making sure that all items in path are legal, which are within the boundaries of the board
     Making sure that the moves in the path are legal
-    :param board:
-    :param path:
-    :return:
+    Making sure we don't go back to the same index on the board
+    :param board: Game board
+    :param path: The current path that given as parameter
+    :return: The word represented by the path or None
     """
     if len(path) == 0:
         return None
@@ -36,21 +39,14 @@ def valid_word(board: Board, path: Path):
     i = 0
     curr_path = set()
     while is_valid and i < len(path):
-        # print("word", i, word)
         cell = path[i]
-        y, x = cell
+        y , x = cell
         if 0 <= x < len(board) and 0 <= y < len(board[0]) and cell not in curr_path:
+            #check the move of second index onwards relative to the previous one if not valid it will break loop
             if i >= 1:
-                # print("i >= 1")
-                if not (
-                    -1 <= y - path[i - 1][0] <= 1 and -1 <= x - path[i - 1][1] <= 1
-                ):
-                    # print("not valid")
-                    is_valid = False
+                if not(-1 <= y - path[i-1][0] <= 1 and -1 <= x - path[i-1][1] <= 1):
                     word = None
                     break
-                # else:
-                #     #print("yes valid")
             word += board[y][x]
             curr_path.add(cell)
 
@@ -63,184 +59,185 @@ def valid_word(board: Board, path: Path):
 
 def find_length_n_paths(n: int, board: Board, words: Iterable[str]) -> List[Path]:
     """
-    transford the word to set beacuse we want to run faster,
-    :param n:
-    :param board:
-    :param words:
-    :return:
+    Returning all valid paths in n size by:
+    creating a words set because it's a more efficient runtime
+    Running on nested loops on every coordinate and call for the helper that check all possible moves for that coordinate
+    Running on the paths and making sure they are valid
+    :param n: represents the length of the routes
+    :param board: game board
+    :param words: given collection of words
+    :return: all valid paths in n size
     """
-    words_set = set()
-    for word in words:
-        string = ""
-        for letter in word:
-            string += letter
-            words_set.add(string)
-    final_lst = []
+    n_paths_lst = []
     uses_path = []
     inner_lst = []
+    words_set = set()
+    for word in words:
+        reconnect_word = ""
+        for letter in word:
+            reconnect_word += letter
+            words_set.add(reconnect_word)
     for i in range(len(board)):
-        for j in range(len(board[0])):
-            row, col = i, j
-            find_length_n_paths_helper(
-                n,
-                words_set,
-                board,
-                row,
-                col,
-                [(i, j)],
-                uses_path + [(row, col)],
-                inner_lst,
-            )
-    # for i in inner_lst:
-    #     if is_valid_path(board,i,words):
-    #         final_lst.append(i)
-    # return (final_lst) == (inner_lst)
-    return inner_lst
+        for j in range (len(board[0])):
+            row,col = i,j
+            # Sending the helper with the current coordinate to initialize the path with starting position
+            find_length_n_paths_helper(n,words_set,board,row,col,[(i,j)],uses_path+[(row,col)],inner_lst)
+    for i in inner_lst:
+        if is_valid_path(board,i,words):
+            n_paths_lst.append(i)
+    return n_paths_lst
 
 
-def make_word_from_path(board, path):
-    word = ""
-    print(path)
-    for cord in path:
-        row, col = cord
-        word += board[row][col]
-    return word
-
-
-def find_length_n_paths_helper(n, words, board, row, col, path, uses_path, inner_lst):
+def create_word(board, path):
     """
-    in evrey index we  for all travelers
-    :param n:
-    :param words:
-    :param board:
-    :param row:
-    :param col:
-    :param path:
-    :param uses_path:
-    :param inner_lst:
-    :return:
+    Create a word from a given path
+    :param board: game board
+    :param path: given path
+    :return: Word represented by the path
     """
-    word = make_word_from_path(board, path)
-    # print(word)
+    curr_word = ""
+    for index in path:
+        row , col = index
+        curr_word += board[row][col]
+    return curr_word
+
+
+def find_length_n_paths_helper(n,words,board,row,col,path,uses_path,inner_lst):
+    """
+    Creating a list with all possible moves for current coordinate
+    explore recursively every index and checks all possible moves for every new coordinate, backtracking occurs when
+    the path not lead to a valid word or it exceeds the desired length and it will backtrack to find other possibilities
+    :param n:The size of the path
+    :param words:given collection of words
+    :param board:game board
+    :param row:index of row
+    :param col: index of column
+    :param path: curr_path
+    :param uses_path: what we use until now
+    :param inner_lst: list of valid pathes
+    :return:  inner list when the path reaches size n
+    """
+    word= create_word(board,path)
     if word:
         if word not in words:
             return
-    if (len(path)) == n:
+    if(len(path)) == n:
         inner_lst.append(path)
         return
-    moves = all_moves(row, col, board, uses_path)
-    # print(moves, "this is moves ", ",row=", row, " col=", col)
+    moves = all_moves(row,col,board,uses_path)
     for move in moves:
-        cur_row = move[0]
-        cur_cul = move[1]
-        if (cur_row, cur_cul) not in uses_path:
-            print(cur_row, cur_cul, " tuple")
-            find_length_n_paths_helper(
-                n,
-                words,
-                board,
-                cur_row,
-                cur_cul,
-                path + [(cur_row, cur_cul)],
-                uses_path + [(cur_row, cur_cul)],
-                inner_lst,
-            )
+        curr_row = move[0]
+        curr_cul = move[1]
+        if (curr_row, curr_cul) not in uses_path:
+            find_length_n_paths_helper(n,words,board,curr_row,curr_cul,path+[(curr_row,curr_cul)],uses_path +[(curr_row,curr_cul)],inner_lst)
     return
 
 
-def all_moves(row, col, board, uses_path):
+def all_moves(row,col,board,uses_path):
+    """
+    find all possible moves for a coordinate on the board and checks if its valid, it will be ok if we dont use
+    the coordinate already and if we dont use the same coordinate from the start position
+    :param row: Initial row
+    :param col: Initial column
+    :param board: game board
+    :param uses_path: all coordinate that we used already in that call
+    :return: list of possible moves
+    """
     moves = []
-    for i in range(row - 1, row + 2):
-        for j in range(col - 1, col + 2):
-            if valid_move(board, i, j, uses_path) and ((i, j) != (row, col)):
-                moves.append((i, j))
+    for i in range(row-1,row+2):
+        for j in range(col-1,col+2):
+            if valid_move(board,i,j,uses_path) and ((i,j) != (row,col)):
+                moves.append((i,j))
     return moves
 
 
-def valid_move(board, row, col, uses_path):
-    if (
-        0 <= col < len(board[0])
-        and 0 <= row < len(board)
-        and (row, col) not in uses_path
-    ):
+def valid_move(board,row,col,uses_path):
+    """
+    Checks if the move is valid by checking the board boundaries and coordinates we used
+    :param board:game board
+    :param row: current row
+    :param col: current column
+    :param uses_path:all coordinate that we used already in that call
+    :return: True if its valid and false otherwise
+    """
+    if 0<=col<len(board[0]) and 0<=row<len(board) and (row,col) not in uses_path:
         return True
     return False
 
 
-# board = [['Q', 'Q', 'Q', 'Q'],
-#          ['B', 'O', 'B', 'Q'],
-#          ['Q', 'Q', 'Q', 'Q'],
-#          ['Q', 'Q', 'Q', 'Q']]
-# word_dict = {'BOB': True}
-# expected_1 = [[(1, 0), (1, 1), (1, 2)]]
-# expected_2 = [[(1, 2), (1, 1), (1, 0)]]
-# actual = find_length_n_paths(3, board, word_dict)
-# print(actual)
-
-
 def find_length_n_words(n: int, board: Board, words: Iterable[str]) -> List[Path]:
-    final_lst = []
+    """
+    Returning all valid words in n size by:
+    Running on nested loops on every coordinate and call for the helper that check all possible moves for that coordinate
+    Running on the paths and making sure they are valid and the words are valid
+    :param n: represents the length of the word
+    :param board: game board
+    :param words:given collection of words
+    :return: all valid words in n size
+    """
+    n_words_lst = []
     uses_path = []
     inner_lst = []
     for i in range(len(board)):
-        for j in range(len(board[0])):
-            row, col = i, j
-            find_length_n_words_helper(
-                n,
-                words,
-                board,
-                row,
-                col,
-                [(i, j)],
-                uses_path + [(row, col)],
-                inner_lst,
-                "" + board[row][col],
-            )
+        for j in range (len(board[0])):
+            row,col = i,j
+            # Sending the helper with the a list that holds the current word and saves it for the run
+            find_length_n_words_helper(n,words,board,row,col,[(i,j)],uses_path+[(row,col)],inner_lst,""+board[row][col])
     for i in inner_lst:
-        # print(i)
-        if is_valid_path(board, i, words):
-            final_lst.append(i)
-    return final_lst
+        if is_valid_path(board,i,words):
+            n_words_lst.append(i)
+    return n_words_lst
 
 
-def find_length_n_words_helper(
-    n, words, board, row, col, path, uses_path, inner_lst, word
-):
+def find_length_n_words_helper(n,words,board,row,col,path,uses_path,inner_lst,word):
+    """
+    explore recursively every index and checks all possible moves for every new coordinate, backtracking occurs when
+    the path not lead to a valid word or it exceeds the desired length and it will backtrack to find other possibilities
+    :param n:The size of the word
+    :param words:given collection of words
+    :param board:game board
+    :param row:index of row
+    :param col: index of column
+    :param path: curr_path
+    :param uses_path: what we use until now
+    :param inner_lst: list of possible paths
+    :param word: A list that holds all the letters we've collected throughout the run
+    :return: the inner list
+    """
     if len(word) == n:
         inner_lst.append(path)
         return
     moves = all_moves(row, col, board, uses_path)
-    # print(moves, "this is moves ", ",row=", row, " col=", col)
     for move in moves:
-        cur_row = move[0]
-        cur_cul = move[1]
-        if (cur_row, cur_cul) not in uses_path:
-            find_length_n_words_helper(
-                n,
-                words,
-                board,
-                cur_row,
-                cur_cul,
-                path + [(cur_row, cur_cul)],
-                uses_path + [(cur_row, cur_cul)],
-                inner_lst,
-                word + board[cur_row][cur_cul],
-            )
+        curr_row = move[0]
+        curr_cul = move[1]
+        if (curr_row, curr_cul) not in uses_path:
+            find_length_n_words_helper(n, words, board, curr_row, curr_cul, path + [(curr_row, curr_cul)],
+                                       uses_path + [(curr_row, curr_cul)], inner_lst,word + board[curr_row][curr_cul])
     return
 
 
 def max_score_paths(board: Board, words: Iterable[str]) -> List[Path]:
-    word_path_dict = dict()
-    high_score_path = []
-    for cur_length in range(len(board) * len(board[0]), 1, -1):
-        path_lst = find_length_n_paths(cur_length, board, words)
-        # print(path_lst)
-        for path in path_lst:
-            print("path_lst:", path_lst)
-            print("path", path)
-            word = make_word_from_path(board, path)
-            if word not in word_path_dict and word in words:
-                word_path_dict.update({word: path})
-    for key in word_path_dict:
-        high_score_path.append(word_path_dict[key])
-    return high_score_path
+    """
+    Returning  a list of valid paths that provide the maximum score per game for the board and word set by:
+    Starting to find possible paths from the longest path to the lowest(the longest is all the possible cells in
+    the board),it will check if the word has been here before and if thw word exist in the collection of words,
+    if its good it will enter and append to the max_score_path. because its explore from the longest path's first we
+    will get all maximum score path in the end.
+    :param board: game board
+    :param words: given collection of words
+    :return: a list(max score path) of valid paths that provide the maximum score per game for the board and word set
+    """
+    path_word_list = []
+    max_score_path = []
+    seen_words = set()
+    for n in range(len(board) * len(board[0]), 1, -1):
+        curr_path_lst = find_length_n_paths(n, board, words)
+        for path in curr_path_lst:
+            word = create_word(board, path)
+            path_word_list.append((path, word))
+    for path, word in path_word_list:
+        if word not in seen_words and word in words:
+            max_score_path.append(path)
+            seen_words.add(word)
+    return max_score_path

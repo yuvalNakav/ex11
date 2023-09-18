@@ -1,1 +1,3 @@
-<Describe your project's features here>
+Extra features:
+    Delete Button: deletes the last cell that was chosen by the user.
+    Feedback component: Indicates if your last action was successful or not.
